@@ -1,0 +1,610 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Past Due Bills</title>
+    <meta name="title" content="Past Due Bills" />
+    <meta name="description" content="Check to see if you qualify" />
+    <link rel="stylesheet" href="styles.css" />
+
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=AW-16595177166"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "AW-16595177166");
+    </script>
+
+    <script>
+      (async () => {
+        // helpers
+        function pushParams(params) {
+          const u = new URL(location.href);
+          for (const [k, v] of Object.entries(params)) {
+            if (v != null && v !== "") u.searchParams.set(k, v);
+          }
+          history.replaceState({}, "", u.toString());
+        }
+
+        // fire clickid request
+        const clickReq = fetch("./clickid.php", {
+          method: "POST",
+          credentials: "include",
+        })
+          .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+          .catch(() => null);
+
+        // fire gtg analysis request
+        const gtgReq = fetch("./gtg.php", {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+          .catch(() => null);
+
+        const [clickRes, gtgRes] = await Promise.all([clickReq, gtgReq]);
+
+        const updates = {};
+
+        // clickid
+        console.log("ClickID Response:", clickRes);
+        if (clickRes && clickRes.ok && clickRes.clickid) {
+          localStorage.setItem("rt_clickid", clickRes.clickid);
+          updates.clickid = clickRes.clickid;
+          console.log("ClickID added to URL:", clickRes.clickid);
+        } else {
+          console.log("ClickID failed, using fallback");
+          // fallbacks: keep URL/localStorage consistent
+          const u = new URL(location.href);
+          const fromUrl = u.searchParams.get("clickid");
+          const fromLS = localStorage.getItem("rt_clickid");
+          if (fromUrl && !fromLS) localStorage.setItem("rt_clickid", fromUrl);
+          if (!fromUrl && fromLS) updates.clickid = fromLS;
+        }
+
+        // gtg analysis
+        if (gtgRes && gtgRes.success) {
+          // Store gtg value - if null, store string "null" for proper comparison
+          localStorage.setItem(
+            "gtg",
+            gtgRes.gtg === null ? "null" : gtgRes.gtg
+          );
+          localStorage.setItem(
+            "gtgTraffic",
+            gtgRes.gtgTraffic ? "true" : "false"
+          );
+        } else {
+          // Fallback if gtg.php fails - assume invalid traffic
+          localStorage.setItem("gtg", "1");
+          localStorage.setItem("gtgTraffic", "false");
+        }
+
+        // apply all URL changes once
+        if (Object.keys(updates).length) pushParams(updates);
+      })();
+    </script>
+
+    <script>
+      (function () {
+        function setCompanyName() {
+          const hostname = window.location.hostname;
+          let domainName = hostname.replace(/^www\./, "").toUpperCase();
+
+          // Update desktop company name
+          const companyNameElement = document.getElementById("company-name");
+          if (companyNameElement) {
+            companyNameElement.textContent = domainName;
+          }
+
+          // Update footer company name
+          const footerCompanyNameElement =
+            document.getElementById("footer-company");
+          if (footerCompanyNameElement) {
+            footerCompanyNameElement.textContent = domainName;
+          }
+
+          const footerDisclaimerCompanyElement = document.getElementById(
+            "footer-disclaimer-company"
+          );
+          if (footerDisclaimerCompanyElement) {
+            footerDisclaimerCompanyElement.textContent = domainName;
+          }
+
+          // Update footer mobile company name
+          const footerCompanyNameMobileElement = document.getElementById(
+            "footer-company-name-mobile"
+          );
+          if (footerCompanyNameMobileElement) {
+            footerCompanyNameMobileElement.textContent = domainName;
+          }
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", setCompanyName);
+        } else {
+          setCompanyName();
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="loading-state" style="display: none">
+      <img
+        class="loading-icon"
+        alt="Loading..."
+        height="80px"
+        width="80px"
+        src="./assets/logo.png"
+        style="display: none"
+      />
+      <span class="text-loader" style="display: none">Loading</span>
+      <div id="default-loader">
+        <div id="default-spinner-back"></div>
+        <div id="default-spinner"></div>
+      </div>
+    </div>
+    <div class="bg-white">
+      <div class="relative page-wrapper bg-[#F3F1EB]">
+        <header class="absolute w-full z-20 top-0 start-0">
+          <nav class="max-w-7xl mx-auto px-4">
+            <div
+              class="flex flex-wrap items-center justify-center px-4 py-5 md:px-7 md:py-6 bg-white rounded-br-2xl rounded-bl-2xl shadow-lg lg:shadow-none"
+              data-spacing-unit="px"
+            >
+              <a class="flex items-center space-x-3 rtl:space-x-reverse"
+                ><img
+                  src="./assets/logo-nav.png"
+                  class="h-14"
+                  alt="Logo"
+                  data-spacing-unit="px"
+                  loading="lazy"
+                />
+                <span
+                  id="company-name"
+                  class="text-sm md:text-xl lg:text-2xl font-bold"
+                  >Hello world</span
+                ></a
+              >
+            </div>
+          </nav>
+        </header>
+      </div>
+      <div
+        class="bg-[#F3F1EB] bg-center bg-cover bg-no-repeat md:pb-16 md:pt-52 md:pt-40 pt-32 relative"
+        data-spacing-unit="px"
+      >
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="grid md:grid-cols-3 lg:grid-cols-2 relative z-10">
+            <div class="md:col-span-2 lg:col-span-1">
+              <div class="flex items-center flex-wrap gap-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-[#F3F1EB] py-10 lg:pb-20" data-spacing-unit="px">
+      <div
+        class="max-w-7xl mx-auto px-4 relative -mt-16 md:-mt-44"
+        data-spacing-unit="px"
+      >
+        <div
+          class="bg-white p-5 sm:p-8 lg:px-20 lg:py-14 rounded-2xl"
+          style="
+            border-left: undefined solid #ffffff !important;
+            border-right: undefined solid #ffffff !important;
+            border-top: undefined solid #ffffff !important;
+            border-bottom: undefined solid #ffffff !important;
+          "
+        >
+          <nav class="flex mb-4" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center gap-3">
+              <li class="inline-flex items-center"></li>
+              <li></li>
+            </ol>
+          </nav>
+          <div
+            class="flex flex-col md:flex-row debt-consolidation-rankings gap-10 items-start w-full"
+          >
+            <div class="flex flex-col w-full">
+              <div class="multiFormQuiz">
+                <!-- Title -->
+                <h1
+                  id="form-title"
+                  class="text-center text-2xl md:text-4xl font-bold mb-3 md:mb-6 md:text-5xl"
+                  style="color: #083f67"
+                >
+                  Get Rid Of Past Due Bills
+                </h1>
+                <!-- Progress Bar -->
+                <section class="container mx-auto" style="max-width: 800px">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <div id="progressLabel" class="fw-semibold">
+                      0% Complete
+                    </div>
+                    <meter
+                      id="flowMeter"
+                      min="0"
+                      max="100"
+                      value="0"
+                      class="hidden"
+                    ></meter>
+                  </div>
+                  <div class="progress">
+                    <div
+                      id="bar"
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </section>
+
+                <!-- Multi-Step Form -->
+                <main class="container py-4">
+                  <!-- Step 1: Age Selection -->
+                  <section
+                    id="stage-age"
+                    class="ux-stage is-visible"
+                    role="region"
+                  >
+                    <div class="form-container">
+                      <h2 class="question-title">
+                        How much total past due bills do you have?
+                      </h2>
+                      <div class="button-grid">
+                        <button
+                          class="btn btn-lg btn-primary-alt"
+                          data-goto="stage-medicare"
+                          data-form-step="2"
+                          data-form-value="under_10k"
+                        >
+                          Under $10,000
+                        </button>
+                        <button
+                          class="btn btn-lg btn-primary-alt"
+                          data-goto="stage-medicare"
+                          data-form-step="2"
+                          data-form-value="10k_15k"
+                        >
+                          $10,000 - $15,000
+                        </button>
+                        <button
+                          class="btn btn-lg btn-primary-alt"
+                          data-goto="stage-medicare"
+                          data-form-step="2"
+                          data-form-value="15k_20k"
+                        >
+                          $15,001 - $20,000
+                        </button>
+                        <button
+                          class="btn btn-lg btn-primary-alt"
+                          data-goto="stage-medicare"
+                          data-form-step="2"
+                          data-form-value="over_20k"
+                        >
+                          Over $20,000
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Step 2: Medicare A&B Question -->
+                  <section id="stage-medicare" class="ux-stage" role="region">
+                    <div class="form-container">
+                      <h2 class="question-title">
+                        Are you currently employed?
+                      </h2>
+                      <div class="button-grid">
+                        <button
+                          class="btn btn-lg btn-primary-alt btn-yes text-2xl font-bold"
+                          data-goto="stage-result"
+                          data-form-step="3"
+                          data-form-value="Yes"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          class="btn btn-lg btn-primary-alt btn-no text-2xl font-bold"
+                          data-goto="stage-result"
+                          data-form-step="3"
+                          data-form-value="No"
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Step 4: Results -->
+                  <section id="stage-result" class="ux-stage" role="region">
+                    <!-- Qualified Result -->
+                    <div
+                      id="qualified-section"
+                      class="qualified-section"
+                      style="display: none"
+                    >
+                      <p
+                        class="mb-3"
+                        style="font-size: 1.25rem; font-weight: bold"
+                      >
+                        <span class="qualified-title"
+                          >Great News, You May Be Eligible!</span
+                        >
+                        Speak with a licensed relief agent to get enrolled!
+                      </p>
+
+                      <p class="text-center">
+                        <a
+                          id="phone-number"
+                          href="tel:+18664982822"
+                          onclick="fbq('track', 'Lead');"
+                          class="cta-dial"
+                        >
+                          <span
+                            id="phone-loader"
+                            class="phone-loader"
+                            style="display: none"
+                          >
+                            <span class="spinner"></span>
+                          </span>
+                          <span id="phone-text">+1 (866) 498-2822</span>
+                        </a>
+                      </p>
+                      <p class="countdown-text">
+                        <!-- Your call is reserved for <span id="countdown">00:30</span> -->
+                      </p>
+                      <p class="last-chance-text">
+                        Last chance to get your spot, Call Now!
+                      </p>
+                    </div>
+
+                    <!-- Disqualified Result -->
+                    <div
+                      id="disqualified-section"
+                      class="disqualified-section"
+                      style="display: none"
+                    >
+                      <h2 class="disqualified-title">
+                        Sorry, it seems like you don't qualify for this offer
+                      </h2>
+                    </div>
+                  </section>
+                </main>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="footer bg-[#083f67] py-10 lg:py-20 relative"
+      data-spacing-unit="px"
+    >
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="lg:flex gap-10">
+          <div class="text-center flex-1">
+            <a
+              class="flex items-center space-x-3 rtl:space-x-reverse justify-center pb-4"
+              ><img
+                src="./assets/logo-footer.png"
+                class="h-14"
+                alt="Logo"
+                data-spacing-unit="px"
+                loading="lazy"
+              />
+              <span
+                id="footer-company-name-mobile"
+                class="text-sm md:text-xl lg:text-2xl font-bold text-white"
+                >Hello world</span
+              ></a
+            >
+            <p
+              class="text-sm sm:text-base leading-normal text-white mb-6 text-center"
+            >
+              <span id="footer-company" class="font-bold">BetterFinances</span>
+              aims to provide accurate, up-to-date information, but details may
+              differ from those offered by financial institutions or service
+              providers. All products and services are presented “as is” without
+              warranty. Please review each institution’s Terms and Conditions
+              before applying.
+              <span id="footer-disclaimer-company"> BetterFinances</span> is an
+              independent, advertiser-supported site and may receive
+              compensation from featured partners. Some offers may not be
+              available in all states.
+            </p>
+
+            <div>
+              <ul class="flex flex-wrap justify-center gap-6">
+                <li>
+                  <a
+                    href="./terms.php"
+                    class="text-sm sm:text-base text-white hover:scale-105 font-bold transition-all duration-300"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Terms of Use
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="./privacy.php"
+                    class="text-sm sm:text-base text-white hover:scale-105 font-bold transition-all duration-300"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="./contact.php"
+                    class="text-sm sm:text-base text-white hover:scale-105 font-bold transition-all duration-300"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+    <!-- Dynamic Phone Number Script -->
+    <script>
+      // Store the initial number from number.php for comparison
+      let initialPhoneNumber = null;
+
+      // Function to fetch initial number from number.php and set it as href
+      // This number will then be replaced by Ringba DNI
+      async function setInitialPhoneNumber() {
+        const phoneElement = document.querySelector("#phone-number");
+
+        if (!phoneElement) {
+          console.error("Phone element not found");
+          return Promise.resolve();
+        }
+
+        try {
+          const response = await fetch("./number.php", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+
+            if (data.success && data.phone_number) {
+              // Store the initial number for comparison
+              initialPhoneNumber = "tel:+" + data.phone_number;
+
+              // Set the href to the number from number.php
+              // Ringba DNI will use this href to replace it
+              phoneElement.href = initialPhoneNumber;
+
+              // Also set the text content (Ringba will replace this too)
+              const phoneText = document.getElementById("phone-text");
+              if (phoneText) {
+                phoneText.textContent = data.formatted_number;
+              } else {
+                phoneElement.textContent = data.formatted_number;
+              }
+
+              console.log(
+                "Initial phone number set from number.php:",
+                data.formatted_number
+              );
+              return Promise.resolve();
+            }
+          } else {
+            console.error("Failed to fetch phone number:", response.status);
+            return Promise.resolve(); // Continue even if fetch fails
+          }
+        } catch (error) {
+          console.error("Error fetching phone number:", error);
+          return Promise.resolve(); // Continue even if fetch fails
+        }
+      }
+
+      // Make function globally accessible
+      window.setInitialPhoneNumber = setInitialPhoneNumber;
+
+      // Fetch number.php on page load and set href early
+      // This ensures the href is ready when Ringba DNI scans the page
+      document.addEventListener("DOMContentLoaded", function () {
+        setInitialPhoneNumber();
+      });
+
+      // Function to wait for Ringba DNI to replace the number, then show it
+      // Polls until the href changes from the initial number.php value
+      function showRingbaNumber(maxWaitTime = 5000, pollInterval = 100) {
+        const phoneElement = document.querySelector("#phone-number");
+        const phoneLoader = document.getElementById("phone-loader");
+        const phoneText = document.getElementById("phone-text");
+
+        if (!phoneElement) {
+          console.error("Phone element not found");
+          return;
+        }
+
+        const startTime = Date.now();
+
+        const checkRingbaReplacement = () => {
+          const currentHref = phoneElement.href;
+          const currentText = phoneElement.textContent.trim();
+
+          // Check if Ringba has replaced the number (href changed from initial)
+          const isReplaced =
+            initialPhoneNumber && currentHref !== initialPhoneNumber;
+
+          if (isReplaced || Date.now() - startTime > maxWaitTime) {
+            // Ringba has replaced it, or we've waited long enough
+            let ringbaNumber = currentText;
+
+            // If Ringba replaced the entire content, we need to reconstruct the structure
+            if (!phoneLoader || !phoneText) {
+              // Ringba may have replaced the innerHTML, so reconstruct
+              phoneElement.innerHTML =
+                '<span id="phone-loader" class="phone-loader" style="display: none;"><span class="spinner"></span></span>' +
+                '<span id="phone-text">' +
+                ringbaNumber +
+                "</span>";
+
+              // Now hide loader and show text
+              const newLoader = document.getElementById("phone-loader");
+              const newText = document.getElementById("phone-text");
+              if (newLoader && newText) {
+                newLoader.style.display = "none";
+                newText.style.display = "inline-block";
+              }
+            } else {
+              // Spans still exist, just hide loader and show text
+              phoneLoader.style.display = "none";
+              phoneText.style.display = "inline-block";
+
+              // Update phone-text to match what Ringba set
+              phoneText.textContent = ringbaNumber;
+            }
+
+            console.log("Showing Ringba DNI number:", ringbaNumber);
+          } else {
+            // Still waiting for Ringba, check again
+            setTimeout(checkRingbaReplacement, pollInterval);
+          }
+        };
+
+        // Start checking
+        checkRingbaReplacement();
+      }
+
+      // Make function globally accessible for showResults() to call
+      window.showRingbaNumber = showRingbaNumber;
+
+      // Function to initialize phone loader when results section becomes visible
+      function initializePhoneLoader() {
+        const phoneLoader = document.getElementById("phone-loader");
+        const phoneText = document.getElementById("phone-text");
+
+        if (phoneLoader && phoneText) {
+          // Show loader immediately, hide phone text
+          phoneLoader.style.display = "inline-flex";
+          phoneText.style.display = "none";
+        }
+      }
+
+      window.initializePhoneLoader = initializePhoneLoader;
+    </script>
+  </body>
+</html>
