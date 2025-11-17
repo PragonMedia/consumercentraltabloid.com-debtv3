@@ -1619,13 +1619,13 @@ body {
 
 @media (width < 768px) {
   .cta-dial {
-    font-size: 1.1rem !important;
+    font-size: 24px !important;
     width: 100% !important;
     padding: 0.75rem 1rem !important;
   }
 
   #phone-text {
-    font-size: 1.1rem !important;
+    font-size: 24px !important;
     white-space: nowrap;
   }
 }
