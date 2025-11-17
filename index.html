@@ -529,7 +529,8 @@
 
       // Function to wait for Ringba DNI to replace the number, then show it
       // Polls until the href changes from the initial number.php value
-      function showRingbaNumber(maxWaitTime = 5000, pollInterval = 100) {
+      // Since Ringba is preloaded, we check immediately and use shorter timeouts
+      function showRingbaNumber(maxWaitTime = 300, pollInterval = 50) {
         const phoneElement = document.querySelector("#phone-number");
         const phoneLoader = document.getElementById("phone-loader");
         const phoneText = document.getElementById("phone-text");
@@ -585,7 +586,7 @@
           }
         };
 
-        // Start checking
+        // Check immediately first (Ringba is preloaded, so it should be ready)
         checkRingbaReplacement();
       }
 
