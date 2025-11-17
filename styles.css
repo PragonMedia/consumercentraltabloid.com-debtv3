@@ -1498,9 +1498,9 @@ body {
     overflow: hidden;
   }
 
-  /* Hide footer on mobile */
+  /* Footer stays below viewport on mobile but accessible via scroll */
   .footer {
-    display: none !important;
+    overflow-x: hidden;
   }
 
   /* Reduce qualified-section padding on mobile */
