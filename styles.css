@@ -1502,7 +1502,18 @@ body {
   .footer {
     overflow-x: hidden;
   }
-
+  
+  /* Ensure main content fills viewport on mobile to push footer below */
+  /* Make the main content wrapper tall enough to push footer below viewport */
+  body > .bg-white {
+    min-height: 100vh !important;
+  }
+  
+  /* Ensure form content area has minimum height on mobile */
+  .multiFormQuiz {
+    min-height: calc(100vh - 350px) !important;
+  }
+  
   /* Reduce qualified-section padding on mobile */
   .qualified-section {
     padding: 1rem !important;
