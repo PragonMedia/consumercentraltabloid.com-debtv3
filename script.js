@@ -13,7 +13,7 @@ const loadRingba = (shouldAddTags = true) => {
 
   var script = document.createElement("script");
   script.src = "//b-js.ringba.com/CA2c51225417964aa3acf7ef3a0c2fc631";
-  
+
   if (shouldAddTags) {
     let timeoutId = setTimeout(addRingbaTags, 1000);
     script.onload = function () {
@@ -27,7 +27,7 @@ const loadRingba = (shouldAddTags = true) => {
       console.log("Ringba preloaded successfully");
     };
   }
-  
+
   document.head.appendChild(script);
 };
 
@@ -289,68 +289,7 @@ if (!userId) {
 // Removed: setupQualifyButtons and setupTopChoiceButton functions
 // These were for the offer wall which has been removed
 
-// Google Tag Manager Conversion Tracking
-let conversionHandlerAttached = false;
-
-function gtag_report_conversion(url) {
-  console.log("Google Tag Manager conversion fired");
-  var callback = function () {
-    if (typeof url != "undefined") {
-      window.location = url;
-    }
-  };
-  gtag("event", "conversion", {
-    send_to: "AW-16595177166/bhV_CM6I3sAbEM6dmek9",
-    value: 1.0,
-    currency: "USD",
-    event_callback: callback,
-  });
-  return false;
-}
-
-// Add click handler to phone number
-function setupPhoneNumberConversion() {
-  // Prevent multiple event listeners
-  if (conversionHandlerAttached) {
-    return;
-  }
-
-  const phoneElement = document.getElementById("phone-number");
-
-  if (phoneElement) {
-    phoneElement.addEventListener("click", function (e) {
-      // Check if qualified=no in URL - if so, don't fire conversion
-      const urlParams = new URLSearchParams(window.location.search);
-      const qualified = urlParams.get("qualified");
-
-      if (qualified === "no") {
-        return; // Don't fire conversion
-      }
-
-      // Fire conversion
-      const phoneHref = phoneElement.getAttribute("href");
-      gtag_report_conversion(phoneHref);
-    });
-    conversionHandlerAttached = true;
-    console.log("Phone number conversion handler attached");
-  }
-}
-
-// Try to set up phone number conversion handler
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", setupPhoneNumberConversion);
-} else {
-  setupPhoneNumberConversion();
-}
-
-// Also try after page load and with delays to catch dynamically added elements
-window.addEventListener("load", function () {
-  setTimeout(setupPhoneNumberConversion, 100);
-});
-
-setTimeout(setupPhoneNumberConversion, 500);
-setTimeout(setupPhoneNumberConversion, 1000);
-setTimeout(setupPhoneNumberConversion, 2000);
+// Removed: Google Tag Manager Conversion Tracking
 
 // Preload Ringba on page load (without adding tags yet - tags will be added when step 3 is reached)
 // This ensures Ringba is ready when user reaches step 3, eliminating the loading delay
