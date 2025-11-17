@@ -1456,6 +1456,16 @@ body {
   .bg-white.rounded-2xl {
     padding: 1rem !important;
   }
+  
+  /* Hide empty nav and reduce spacing above multiFormQuiz on mobile */
+  .bg-white.rounded-2xl nav {
+    display: none !important;
+  }
+  
+  /* Reduce gap in flex container on mobile */
+  .debt-consolidation-rankings {
+    gap: 1rem !important;
+  }
 
   .phone-number {
     font-size: 1.25rem;
@@ -1524,7 +1534,7 @@ body {
     display: block !important;
     visibility: visible !important;
   }
-  
+
   /* Apply container padding to other containers, but not progress bar section */
   .container:not(section) {
     padding-left: 0.5rem;
@@ -1532,13 +1542,13 @@ body {
     padding-top: 0;
     padding-bottom: 0;
   }
-  
+
   /* Ensure form title is visible */
   #form-title {
     display: block !important;
     visibility: visible !important;
   }
-  
+
   /* Ensure multiFormQuiz is visible */
   .multiFormQuiz {
     display: block !important;
