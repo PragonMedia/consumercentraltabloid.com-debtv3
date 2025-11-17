@@ -342,11 +342,13 @@ body {
   flex-direction: column;
 }
 
-/* Make main content area grow to push footer down */
-body > .bg-white {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* Make main content area grow to push footer down on desktop only */
+@media (min-width: 769px) {
+  body > .bg-white {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 hr {
@@ -1502,18 +1504,13 @@ body {
   .footer {
     overflow-x: hidden;
   }
-  
-  /* Ensure main content fills viewport on mobile to push footer below */
-  /* Make the main content wrapper tall enough to push footer below viewport */
-  body > .bg-white {
-    min-height: 100vh !important;
+
+  /* Ensure main content area pushes footer below viewport on mobile */
+  /* Add padding to bottom of content wrapper to push footer down */
+  body > .bg-white + div[class*="bg-"] {
+    padding-bottom: 50vh !important;
   }
-  
-  /* Ensure form content area has minimum height on mobile */
-  .multiFormQuiz {
-    min-height: calc(100vh - 350px) !important;
-  }
-  
+
   /* Reduce qualified-section padding on mobile */
   .qualified-section {
     padding: 1rem !important;
