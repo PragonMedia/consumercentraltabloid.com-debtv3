@@ -1491,6 +1491,11 @@ body {
   .footer {
     overflow-x: hidden;
   }
+  
+  /* Reduce qualified-section padding on mobile */
+  .qualified-section {
+    padding: 1rem !important;
+  }
 
   .container {
     padding-left: 0.5rem;
@@ -1775,7 +1780,7 @@ body {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 1rem;
+  padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   text-align: center;
   margin: 2rem auto;
