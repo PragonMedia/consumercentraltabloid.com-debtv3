@@ -1,12 +1,33 @@
+// Track if Ringba is already loaded
+let ringbaLoaded = false;
+
 // Load Ringba function - exactly as provided but as JavaScript function
-const loadRingba = () => {
+const loadRingba = (shouldAddTags = true) => {
+  // If Ringba is already loaded, just add tags if needed
+  if (ringbaLoaded) {
+    if (shouldAddTags) {
+      addRingbaTags();
+    }
+    return;
+  }
+
   var script = document.createElement("script");
   script.src = "//b-js.ringba.com/CA2c51225417964aa3acf7ef3a0c2fc631";
-  let timeoutId = setTimeout(addRingbaTags, 1000);
-  script.onload = function () {
-    clearTimeout(timeoutId);
-    addRingbaTags();
-  };
+  
+  if (shouldAddTags) {
+    let timeoutId = setTimeout(addRingbaTags, 1000);
+    script.onload = function () {
+      clearTimeout(timeoutId);
+      addRingbaTags();
+      ringbaLoaded = true;
+    };
+  } else {
+    script.onload = function () {
+      ringbaLoaded = true;
+      console.log("Ringba preloaded successfully");
+    };
+  }
+  
   document.head.appendChild(script);
 };
 
@@ -198,12 +219,14 @@ $("button[data-goto]").on("click", function () {
     // Show results section first
     showResults();
 
-    // Load Ringba - the href has already been set from number.php on page load
+    // Add/update Ringba tags with final values - Ringba should already be loaded
+    // The href has already been set from number.php on page load
     // Ringba DNI will replace it with their pool number
-    loadRingba();
+    addRingbaTags();
 
     // Start polling for Ringba DNI replacement
     // showRingbaNumber will wait until Ringba actually replaces the number
+    // Since Ringba is preloaded, this should be much faster
     if (typeof window.showRingbaNumber === "function") {
       window.showRingbaNumber();
     }
@@ -328,3 +351,13 @@ window.addEventListener("load", function () {
 setTimeout(setupPhoneNumberConversion, 500);
 setTimeout(setupPhoneNumberConversion, 1000);
 setTimeout(setupPhoneNumberConversion, 2000);
+
+// Preload Ringba on page load (without adding tags yet - tags will be added when step 3 is reached)
+// This ensures Ringba is ready when user reaches step 3, eliminating the loading delay
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function () {
+    loadRingba(false); // Load Ringba but don't add tags yet
+  });
+} else {
+  loadRingba(false); // Load Ringba but don't add tags yet
+}
